@@ -4,7 +4,7 @@ import decksearch
 from lor_deckcodes import LoRDeck
 
 def run_discord_bot():
-    TOKEN = 'OTAyNjU1MDA0MTQwMjQwOTE2.Gq8FLG.lImLswI0TkUIFNt1ysbhe0l_dvLnaHNX8yzehk'
+    TOKEN = 'Insert Discord Token here'
     intents = discord.Intents.default()
     intents.message_content = True
     client = commands.Bot(command_prefix="!",  intents=intents)
