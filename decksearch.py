@@ -5,20 +5,22 @@ import pathlib
 from dataclasses import dataclass
 
 # loading the sets
-MAIN_DATA_PATH = pathlib.Path(r"B:\Eigene Dateien\desktop\bard bot\lor_decks")
+MAIN_DATA_PATH = pathlib.Path(r"B:\eigene dateien\desktop\bard bot\lor_decks")
 
 
 deck = LoRDeck.from_deckcode('CUDQCAQAAIAQKAAMAEDACEQBAYCAQAIGA4CAEAIADUWQIBQACEMBWHIDAEBAAAIBAYAAWAIGBQNACAIBAASQ')
 card = deck.cards[1]
 
+
+
 def load_all_sets(MAIN_DATA_PATH):
     set1_path = MAIN_DATA_PATH / "set1-lite-en_us\en_us\data\set1-en_us.json"
-    set2_path = r"B:\Eigene Dateien\desktop\bard bot\lor_decks\set2-lite-en_us\en_us\data\set2-en_us.json"
-    set3_path = r"B:\Eigene Dateien\desktop\bard bot\lor_decks\set3-lite-en_us\en_us\data\set3-en_us.json"
-    set4_path = r"B:\Eigene Dateien\desktop\bard bot\lor_decks\set4-lite-en_us\en_us\data\set4-en_us.json"
-    set5_path = r"B:\Eigene Dateien\desktop\bard bot\lor_decks\set5-lite-en_us\en_us\data\set5-en_us.json"
-    set6_path = r"B:\Eigene Dateien\desktop\bard bot\lor_decks\set6-lite-en_us\en_us\data\set6-en_us.json"
-    set7_path = r"B:\Eigene Dateien\desktop\bard bot\lor_decks\set6cde-lite-en_us\en_us\data\set6cde-en_us.json"
+    set2_path = MAIN_DATA_PATH / "set2-lite-en_us\en_us\data\set2-en_us.json"
+    set3_path = MAIN_DATA_PATH / "set3-lite-en_us\en_us\data\set3-en_us.json"
+    set4_path = MAIN_DATA_PATH / "set4-lite-en_us\en_us\data\set4-en_us.json"
+    set5_path = MAIN_DATA_PATH / "set5-lite-en_us\en_us\data\set5-en_us.json"
+    set6_path = MAIN_DATA_PATH / "set6-lite-en_us\en_us\data\set6-en_us.json"
+    set7_path = MAIN_DATA_PATH / "set6cde-lite-en_us\en_us\data\set6cde-en_us.json"
     all_sets = []
 # storing sets from the json
     for i in range(0, 7):
@@ -34,7 +36,7 @@ def load_all_sets(MAIN_DATA_PATH):
 # 
 # @returns: dictionary of the given card code
 #
-def get_card_dictionary(card, all_sets):
+def get_card_dictionary_of_card_code(card, all_sets):
     if card.set == 6:
         for card_dictionary in all_sets[5]:
             if card_dictionary.get("cardCode") == card.card_code:               
@@ -49,13 +51,22 @@ def get_card_dictionary(card, all_sets):
 
     raise RuntimeError(f"Cannot find {card} in the given sets.")
 
+
+def get_card_dictionary_of_card_CODE(card_code, all_sets):
+    for card_set in all_sets:
+        for card_dictionary in card_set:
+            if  card_dictionary["cardCode"] == card_code:
+                return card_dictionary
+    
+    raise RuntimeError(f"Cannot find {card_code} in the given sets.")
+
 #
 # sorts a decklist for its card costs 
 #
 # @returns: a list of tuples with the sorted cards dictionarys and their respective number of copies
 #
 def sort_for_cost(deck, all_sets):    
-    card_list = [(get_card_dictionary(card, all_sets), card.count) for card in deck.cards]
+    card_list = [(get_card_dictionary_of_card_code(card, all_sets), card.count) for card in deck.cards]
     sorted_card_list = sorted(card_list, key=lambda x:x[0]["cost"])
     return sorted_card_list
 
@@ -72,12 +83,14 @@ def get_champions(deck):
             champion_list.append(str(card[1]) + "x " + card[0]["name"])
     return champion_list
 
+
+
 def get_units(deck):
-    list = []
+    unit_list = []
     for card in deck:
         if card[0]["supertype"] != "Champion" and card[0]["type"] == "Unit":
-            list.append(str(card[1]) + "x " + card[0]["name"])
-    return list
+            unit_list.append(str(card[1]) + "x " + card[0]["name"])
+    return unit_list
 
 def get_other(deck):
     other_list = []
@@ -110,12 +123,14 @@ def card_list_to_string(card_list):
 #
 # @returns: the url of a cards respective card Image
 #
-def get_url_path(card_name, all_sets):
+def get_dictionary_of_card_name(card_name, all_sets):
     card_name = card_name.lower()  
     for card_set in all_sets:
         for card_dictionary in card_set:
             if card_dictionary["name"].lower() == card_name:
-                card_path = card_dictionary["assets"][0]["gameAbsolutePath"]
-                return card_path
+                return card_dictionary
     raise RuntimeError(f"Cannot find {card_name} in all_sets")
+
+
+
 
