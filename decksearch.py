@@ -11,18 +11,21 @@ MAIN_DATA_PATH = pathlib.Path(r"B:\eigene dateien\desktop\bard bot\lor_decks")
 deck = LoRDeck.from_deckcode('CUDQCAQAAIAQKAAMAEDACEQBAYCAQAIGA4CAEAIADUWQIBQACEMBWHIDAEBAAAIBAYAAWAIGBQNACAIBAASQ')
 card = deck.cards[1]
 
-
-
+#
+# load all set.json files and store them in a list
+#
+# @returns: list of all sets containing dictionarys of the cards
+#
 def load_all_sets(MAIN_DATA_PATH):
-    set1_path = MAIN_DATA_PATH / "set1-lite-en_us\en_us\data\set1-en_us.json"
-    set2_path = MAIN_DATA_PATH / "set2-lite-en_us\en_us\data\set2-en_us.json"
-    set3_path = MAIN_DATA_PATH / "set3-lite-en_us\en_us\data\set3-en_us.json"
-    set4_path = MAIN_DATA_PATH / "set4-lite-en_us\en_us\data\set4-en_us.json"
-    set5_path = MAIN_DATA_PATH / "set5-lite-en_us\en_us\data\set5-en_us.json"
-    set6_path = MAIN_DATA_PATH / "set6-lite-en_us\en_us\data\set6-en_us.json"
-    set7_path = MAIN_DATA_PATH / "set6cde-lite-en_us\en_us\data\set6cde-en_us.json"
+    set1_path = MAIN_DATA_PATH / "set1-en_us.json"
+    set2_path = MAIN_DATA_PATH / "set2-en_us.json"
+    set3_path = MAIN_DATA_PATH / "set3-en_us.json"
+    set4_path = MAIN_DATA_PATH / "set4-en_us.json"
+    set5_path = MAIN_DATA_PATH / "set5-en_us.json"
+    set6_path = MAIN_DATA_PATH / "set6-en_us.json"
+    set7_path = MAIN_DATA_PATH / "set6cde-en_us.json"
     all_sets = []
-# storing sets from the json
+    # storing sets from the json
     for i in range(0, 7):
         all_sets_path = [set1_path, set2_path, set3_path, set4_path, set5_path,
         set6_path, set7_path]
@@ -32,11 +35,11 @@ def load_all_sets(MAIN_DATA_PATH):
     return all_sets
 
 #
-# search function that searches for the dictionary of a single inserted card code(01FR036)
+# get function that searches for the dictionary of a single inserted deck.card(3:01FR036)
 # 
-# @returns: dictionary of the given card code
+# @returns: dictionary of the given deck.card
 #
-def get_card_dictionary_of_card_code(card, all_sets):
+def get_card_dictionary_of_deck_dot_card(card, all_sets: list):
     if card.set == 6:
         for card_dictionary in all_sets[5]:
             if card_dictionary.get("cardCode") == card.card_code:               
@@ -51,8 +54,12 @@ def get_card_dictionary_of_card_code(card, all_sets):
 
     raise RuntimeError(f"Cannot find {card} in the given sets.")
 
-
-def get_card_dictionary_of_card_CODE(card_code, all_sets):
+#
+# get function that searches in all_sets for the dictionary of a single inserted card code (01FR036)
+#
+# @returns: dictionary of the given card code
+#
+def get_card_dictionary_of_card_code(card_code: str, all_sets: list):
     for card_set in all_sets:
         for card_dictionary in card_set:
             if  card_dictionary["cardCode"] == card_code:
@@ -65,8 +72,8 @@ def get_card_dictionary_of_card_CODE(card_code, all_sets):
 #
 # @returns: a list of tuples with the sorted cards dictionarys and their respective number of copies
 #
-def sort_for_cost(deck, all_sets):    
-    card_list = [(get_card_dictionary_of_card_code(card, all_sets), card.count) for card in deck.cards]
+def sort_for_cost(deck, all_sets: list):    
+    card_list = [(get_card_dictionary_of_deck_dot_card(card, all_sets), card.count) for card in deck.cards]
     sorted_card_list = sorted(card_list, key=lambda x:x[0]["cost"])
     return sorted_card_list
 
@@ -82,8 +89,6 @@ def get_champions(deck):
         if card[0]["supertype"] == "Champion":
             champion_list.append(str(card[1]) + "x " + card[0]["name"])
     return champion_list
-
-
 
 def get_units(deck):
     unit_list = []
@@ -107,30 +112,26 @@ def get_spells(deck):
     return spells_list
 
 #
-# read in list of cards
+# read in list of card names
 #
 # @returns: string of inserted list
 #
-def card_list_to_string(card_list):
+def card_name_list_to_string(card_names: list):
     word = ""
-    for card in card_list:
+    for card in card_names:
         word += card + "\n"
     return word
 
 #
 # search function that inserts a cards name and
-# searches for the card image in it's respective dictionary
+# searches for cards respective dictionary in all sets
 #
 # @returns: the url of a cards respective card Image
 #
-def get_dictionary_of_card_name(card_name, all_sets):
+def get_dictionary_of_card_name(card_name, all_sets: list):
     card_name = card_name.lower()  
     for card_set in all_sets:
         for card_dictionary in card_set:
             if card_dictionary["name"].lower() == card_name:
                 return card_dictionary
     raise RuntimeError(f"Cannot find {card_name} in all_sets")
-
-
-
-
